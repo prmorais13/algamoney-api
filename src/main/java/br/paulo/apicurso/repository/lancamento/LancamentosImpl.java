@@ -1,5 +1,6 @@
 package br.paulo.apicurso.repository.lancamento;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
+import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
 import br.paulo.apicurso.model.Categoria_;
 import br.paulo.apicurso.model.Lancamento;
 import br.paulo.apicurso.model.Lancamento_;
@@ -27,6 +29,34 @@ public class LancamentosImpl implements LancamentosQuery {
 
 	@Autowired
 	private EntityManager manager;
+	
+	@Override
+	public List<LancamentoEstatisticaCategoria> porCategoria(LocalDate mesReferencia) {
+		
+		CriteriaBuilder builder = this.manager.getCriteriaBuilder();
+		
+		CriteriaQuery<LancamentoEstatisticaCategoria> criteria = builder.
+				createQuery(LancamentoEstatisticaCategoria.class);
+		
+		Root<Lancamento> root = criteria.from(Lancamento.class);
+		
+		criteria.select(builder.construct(LancamentoEstatisticaCategoria.class,
+				root.get(Lancamento_.categoria), builder.sum(root.get(Lancamento_.valor))));
+		
+		LocalDate primeiroDia = mesReferencia.withDayOfMonth(1);
+		LocalDate ultimoDia = mesReferencia.withDayOfMonth(mesReferencia.lengthOfMonth());
+		
+		criteria.where(
+			builder.greaterThanOrEqualTo(root.get(Lancamento_.dataVencimento), primeiroDia),
+			builder.lessThanOrEqualTo(root.get(Lancamento_.dataVencimento), ultimoDia)		
+		);
+		
+		criteria.groupBy(root.get(Lancamento_.categoria));
+		
+		TypedQuery<LancamentoEstatisticaCategoria> query = this.manager.createQuery(criteria);
+		
+		return query.getResultList();
+	}
 
 	@Override
 	public Page<Lancamento> filtrar(LancamentoFilter lancamentoFilter, Pageable pageable) {
@@ -110,8 +140,5 @@ public class LancamentosImpl implements LancamentosQuery {
 		
 		return this.manager.createQuery(criteria).getSingleResult();
 	}
-
-
-
 
 }

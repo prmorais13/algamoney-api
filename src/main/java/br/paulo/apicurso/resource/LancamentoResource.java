@@ -1,5 +1,6 @@
 package br.paulo.apicurso.resource;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
 import br.paulo.apicurso.event.RecursoCriadoEvent;
 import br.paulo.apicurso.exceptionhandler.ApicursoExceptionHandler.Erro;
 import br.paulo.apicurso.model.Lancamento;
@@ -46,6 +48,12 @@ public class LancamentoResource {
 	
 	@Autowired
 	private MessageSource messageSource;
+	
+	@GetMapping("/estatisticas/por-categoria")
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")
+	public List<LancamentoEstatisticaCategoria> porCategoria() {
+		return this.lancamentoService.porCategoria(LocalDate.now());
+	}
 	
 	// busca lançamentos de acordo com os filtros informados na url
 	@GetMapping

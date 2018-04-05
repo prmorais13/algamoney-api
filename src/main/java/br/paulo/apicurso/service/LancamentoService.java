@@ -1,11 +1,15 @@
 package br.paulo.apicurso.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
 import br.paulo.apicurso.model.Lancamento;
 import br.paulo.apicurso.model.Pessoa;
 import br.paulo.apicurso.repository.Lancamentos;
@@ -22,6 +26,10 @@ public class LancamentoService {
 
 	@Autowired
 	private Pessoas pessoas;
+	
+	public List<LancamentoEstatisticaCategoria> porCategoria(LocalDate mesReferencia) {
+		return this.lancamentos.porCategoria(mesReferencia);
+	}
 	
 	public Page<Lancamento> pesquisa(LancamentoFilter lancamentoFilter, Pageable pageable) {		
 		return this.lancamentos.filtrar(lancamentoFilter, pageable);

@@ -5,3 +5,4 @@ CREATE TABLE categoria (
 
 INSERT INTO categoria (nome) VALUES('Lazer');
 INSERT INTO categoria (nome) VALUES('Alimentação');
+INSERT INTO categoria (nome) VALUES('Combustível');
