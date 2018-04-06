@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
+import br.paulo.apicurso.dto.LancamentoEstatisticaDia;
 import br.paulo.apicurso.event.RecursoCriadoEvent;
 import br.paulo.apicurso.exceptionhandler.ApicursoExceptionHandler.Erro;
 import br.paulo.apicurso.model.Lancamento;
@@ -48,6 +49,12 @@ public class LancamentoResource {
 	
 	@Autowired
 	private MessageSource messageSource;
+	
+	@GetMapping("/estatisticas/por-dia")
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")
+	public List<LancamentoEstatisticaDia> porDia() {
+		return this.lancamentoService.porDia(LocalDate.now());
+	}
 	
 	@GetMapping("/estatisticas/por-categoria")
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
+import br.paulo.apicurso.dto.LancamentoEstatisticaDia;
 import br.paulo.apicurso.model.Lancamento;
 import br.paulo.apicurso.model.Pessoa;
 import br.paulo.apicurso.repository.Lancamentos;
@@ -26,6 +27,10 @@ public class LancamentoService {
 
 	@Autowired
 	private Pessoas pessoas;
+	
+	public List<LancamentoEstatisticaDia> porDia(LocalDate mesReferencia) {
+		return this.lancamentos.porDia(mesReferencia);
+	}
 	
 	public List<LancamentoEstatisticaCategoria> porCategoria(LocalDate mesReferencia) {
 		return this.lancamentos.porCategoria(mesReferencia);

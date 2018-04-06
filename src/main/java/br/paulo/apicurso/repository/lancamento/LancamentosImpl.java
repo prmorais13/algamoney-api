@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
 import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
+import br.paulo.apicurso.dto.LancamentoEstatisticaDia;
 import br.paulo.apicurso.model.Categoria_;
 import br.paulo.apicurso.model.Lancamento;
 import br.paulo.apicurso.model.Lancamento_;
@@ -29,6 +30,39 @@ public class LancamentosImpl implements LancamentosQuery {
 
 	@Autowired
 	private EntityManager manager;
+	
+	@Override
+	public List<LancamentoEstatisticaDia> porDia(LocalDate mesReferencia) {
+
+		CriteriaBuilder builder = this.manager.getCriteriaBuilder();
+		
+		CriteriaQuery<LancamentoEstatisticaDia> criteria = builder.
+				createQuery(LancamentoEstatisticaDia.class);
+		
+		Root<Lancamento> root = criteria.from(Lancamento.class);
+		
+		criteria.select(builder.construct(LancamentoEstatisticaDia.class,
+				root.get(Lancamento_.tipo),
+				root.get(Lancamento_.dataVencimento),
+				builder.sum(root.get(Lancamento_.valor))));
+		
+		LocalDate primeiroDia = mesReferencia.withDayOfMonth(1);
+		LocalDate ultimoDia = mesReferencia.withDayOfMonth(mesReferencia.lengthOfMonth());
+		
+		criteria.where(
+			builder.greaterThanOrEqualTo(root.get(Lancamento_.dataVencimento), primeiroDia),
+			builder.lessThanOrEqualTo(root.get(Lancamento_.dataVencimento), ultimoDia)		
+		);
+		
+		criteria.groupBy(
+			root.get(Lancamento_.tipo),
+			root.get(Lancamento_.dataVencimento)
+		);
+		
+		TypedQuery<LancamentoEstatisticaDia> query = this.manager.createQuery(criteria);
+		
+		return query.getResultList();
+	}
 	
 	@Override
 	public List<LancamentoEstatisticaCategoria> porCategoria(LocalDate mesReferencia) {
