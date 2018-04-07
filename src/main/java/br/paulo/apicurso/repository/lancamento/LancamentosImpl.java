@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 
 import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
 import br.paulo.apicurso.dto.LancamentoEstatisticaDia;
+import br.paulo.apicurso.dto.LancamentoEstatisticaPessoa;
 import br.paulo.apicurso.model.Categoria_;
 import br.paulo.apicurso.model.Lancamento;
 import br.paulo.apicurso.model.Lancamento_;
@@ -30,6 +31,36 @@ public class LancamentosImpl implements LancamentosQuery {
 
 	@Autowired
 	private EntityManager manager;
+	
+	@Override
+	public List<LancamentoEstatisticaPessoa> porPessoa(LocalDate dataInicio, LocalDate dataFinal) {
+
+		CriteriaBuilder builder = this.manager.getCriteriaBuilder();
+		
+		CriteriaQuery<LancamentoEstatisticaPessoa> criteria = builder.
+				createQuery(LancamentoEstatisticaPessoa.class);
+		
+		Root<Lancamento> root = criteria.from(Lancamento.class);
+		
+		criteria.select(builder.construct(LancamentoEstatisticaPessoa.class,
+				root.get(Lancamento_.tipo),
+				root.get(Lancamento_.pessoa),
+				builder.sum(root.get(Lancamento_.valor))));
+		
+		criteria.where(
+			builder.greaterThanOrEqualTo(root.get(Lancamento_.dataVencimento), dataInicio),
+			builder.lessThanOrEqualTo(root.get(Lancamento_.dataVencimento), dataFinal)		
+		);
+		
+		criteria.groupBy(
+			root.get(Lancamento_.tipo),
+			root.get(Lancamento_.pessoa)
+		);
+		
+		TypedQuery<LancamentoEstatisticaPessoa> query = this.manager.createQuery(criteria);
+		
+		return query.getResultList();
+	}
 	
 	@Override
 	public List<LancamentoEstatisticaDia> porDia(LocalDate mesReferencia) {

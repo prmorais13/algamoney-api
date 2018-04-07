@@ -1,7 +1,12 @@
 package br.paulo.apicurso.service;
 
+import java.io.InputStream;
+import java.sql.Date;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
 import br.paulo.apicurso.dto.LancamentoEstatisticaDia;
+import br.paulo.apicurso.dto.LancamentoEstatisticaPessoa;
 import br.paulo.apicurso.model.Lancamento;
 import br.paulo.apicurso.model.Pessoa;
 import br.paulo.apicurso.repository.Lancamentos;
@@ -18,6 +24,11 @@ import br.paulo.apicurso.repository.Pessoas;
 import br.paulo.apicurso.repository.filter.LancamentoFilter;
 import br.paulo.apicurso.repository.projection.ResumoLancamento;
 import br.paulo.apicurso.service.exception.PessoaInexistenteOuInativaException;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 public class LancamentoService {
@@ -52,6 +63,23 @@ public class LancamentoService {
 	public Lancamento salvar(Lancamento lancamento) {
 		this.validarPessoa(lancamento);
 		return this.lancamentos.save(lancamento);
+	}
+	
+	public byte[] relatorioPorPessoa(LocalDate dataInicio, LocalDate dataFinal) throws JRException {
+		List<LancamentoEstatisticaPessoa> dados = this.lancamentos.porPessoa(dataInicio, dataFinal);
+		
+		Map<String, Object> parametros = new HashMap<>();
+		parametros.put("DT_INICIO", Date.valueOf(dataInicio));
+		parametros.put("DT_FINAL", Date.valueOf(dataFinal));
+		parametros.put("REPORT_LOCALE", new Locale("pt", "BR"));
+		
+		InputStream stream = this.getClass().getResourceAsStream(
+				"/relatorios/lancamentos-por-pessoa.jasper");
+		
+		JasperPrint relatorio = JasperFillManager.fillReport(stream, parametros,
+				new JRBeanCollectionDataSource(dados));
+		
+		return JasperExportManager.exportReportToPdf(relatorio);
 	}
 	
 	public Lancamento atualizar(Long codigo, Lancamento lancamento) {
