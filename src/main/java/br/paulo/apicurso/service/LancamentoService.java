@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
@@ -38,6 +39,11 @@ public class LancamentoService {
 
 	@Autowired
 	private Pessoas pessoas;
+	
+	@Scheduled(cron = "0 30 21 * * *")
+	public void avisarLancamentosVencidos() {
+		System.out.println(">>>>>>>>>>>>>>Método sendo executado...");
+	}
 	
 	public List<LancamentoEstatisticaDia> porDia(LocalDate mesReferencia) {
 		return this.lancamentos.porDia(mesReferencia);
