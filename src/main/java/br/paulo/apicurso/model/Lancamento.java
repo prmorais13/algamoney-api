@@ -17,6 +17,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "lancamento")
 public class Lancamento {
@@ -107,6 +109,11 @@ public class Lancamento {
 	public void setCategoria(Categoria categoria) {
 		this.categoria = categoria;
 	}
+	
+/*	@JsonIgnore
+	public boolean isReceita() {
+		return TipoLancamento.RECEITA.equals(this.tipo);
+	}*/
 	
 	@NotNull
 	@ManyToOne
