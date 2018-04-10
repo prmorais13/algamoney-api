@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -110,11 +111,6 @@ public class Lancamento {
 		this.categoria = categoria;
 	}
 	
-/*	@JsonIgnore
-	public boolean isReceita() {
-		return TipoLancamento.RECEITA.equals(this.tipo);
-	}*/
-	
 	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "codigo_pessoa")
@@ -125,7 +121,13 @@ public class Lancamento {
 	public void setPessoa(Pessoa pessoa) {
 		this.pessoa = pessoa;
 	}
-
+	
+	@JsonIgnore
+	@Transient
+	public boolean isReceita() {
+		return TipoLancamento.RECEITA.equals(this.tipo);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,10 +20,13 @@ import org.springframework.stereotype.Service;
 import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
 import br.paulo.apicurso.dto.LancamentoEstatisticaDia;
 import br.paulo.apicurso.dto.LancamentoEstatisticaPessoa;
+import br.paulo.apicurso.mail.Mailer;
 import br.paulo.apicurso.model.Lancamento;
 import br.paulo.apicurso.model.Pessoa;
+import br.paulo.apicurso.model.Usuario;
 import br.paulo.apicurso.repository.Lancamentos;
 import br.paulo.apicurso.repository.Pessoas;
+import br.paulo.apicurso.repository.UsuarioRepository;
 import br.paulo.apicurso.repository.filter.LancamentoFilter;
 import br.paulo.apicurso.repository.projection.ResumoLancamento;
 import br.paulo.apicurso.service.exception.PessoaInexistenteOuInativaException;
@@ -34,15 +39,48 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 @Service
 public class LancamentoService {
 	
+	private static final Logger logger = LoggerFactory.getLogger(LancamentoService.class);
+	
 	@Autowired
 	private Lancamentos lancamentos;
 
 	@Autowired
 	private Pessoas pessoas;
 	
-	@Scheduled(cron = "0 30 21 * * *")
+	@Autowired
+	private UsuarioRepository usuarios;
+	
+	@Autowired
+	private Mailer mailer;
+	
+	
+	@Scheduled(cron = "0 30 10 * * *")
+	// @Scheduled(fixedDelay = 1000 * 60 * 30)
 	public void avisarLancamentosVencidos() {
-		System.out.println(">>>>>>>>>>>>>>Método sendo executado...");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Preparando envio de emails com lançamentos vencidos.");
+		}
+		
+		List<Lancamento> vencidos = this.lancamentos.findByDataVencimentoLessThanEqualAndDataPagamentoIsNull(LocalDate.now());	
+		
+		if (vencidos.isEmpty()) {
+			logger.info("Não existem lançamentos vencidos.");
+			return;
+		}
+		
+		logger.info("Existe(m} {} lançmento(s) vencido(s).", vencidos.size());
+		
+		List<Usuario> destinatarios = this.usuarios.findByPermissoesDescricao("ROLE_PESQUISAR_LANCAMENTO");
+		
+		if (destinatarios.isEmpty()) {
+			logger.warn("Existem lançamentos vencidos, mas não foram encontrados destinatários para envio");
+			return;
+		}
+		
+		this.mailer.avisarLancamentosVencidos(vencidos, destinatarios);
+		
+		logger.info("Email com Lançamentos vencidos enviado.");
+
 	}
 	
 	public List<LancamentoEstatisticaDia> porDia(LocalDate mesReferencia) {

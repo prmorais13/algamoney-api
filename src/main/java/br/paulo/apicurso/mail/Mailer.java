@@ -1,17 +1,15 @@
 package br.paulo.apicurso.mail;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -19,7 +17,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import br.paulo.apicurso.model.Lancamento;
-import br.paulo.apicurso.repository.Lancamentos;
+import br.paulo.apicurso.model.Usuario;
 
 @Component
 public class Mailer {
@@ -30,25 +28,40 @@ public class Mailer {
 	@Autowired
 	private TemplateEngine thymeleaf;
 	
-	@Autowired
-	private Lancamentos repo;
+//	@Autowired
+//	private Lancamentos repo;
+//	
+//	@EventListener
+//	private void teste(ApplicationReadyEvent event) {
+//		String template = "mail/aviso-lancamentos-vencidos";
+//		
+//		
+//		List<Lancamento> lista = repo.findAll();
+//		
+//		Map<String, Object> variaveis = new HashMap<>();
+//		variaveis.put("lancamentos", lista);
+//			
+//		this.enviarEmail("prmorais1302@gmail.com",
+//						 Arrays.asList("prmorais_13@hotmail.com"),
+//						 "Testando algamoney",
+//						 template, variaveis);
+//		
+//		System.out.println("E-mail enviado com sucesso.");
+//	}
 	
-	@EventListener
-	private void teste(ApplicationReadyEvent event) {
-		String template = "mail/aviso-lancamentos-vencidos";
-		
-		
-		List<Lancamento> lista = repo.findAll();
-		
+	public void avisarLancamentosVencidos(List<Lancamento> vencidos, List<Usuario> destinatarios) {
 		Map<String, Object> variaveis = new HashMap<>();
-		variaveis.put("lancamentos", lista);
-			
-		this.enviarEmail("prmorais1302@gmail.com",
-						 Arrays.asList("prmorais_13@hotmail.com"),
-						 "Testando algamoney",
-						 template, variaveis);
+		variaveis.put("lancamentos", vencidos);
 		
-		System.out.println("E-mail enviado com sucesso.");
+		List<String> emails = destinatarios.stream()
+			.map(u -> u.getEmail())
+			.collect(Collectors.toList());
+		
+		this.enviarEmail("prmorais1302@gmail.com",
+				emails,
+				"Lancamentos vencidos",
+				"mail/aviso-lancamentos-vencidos",
+				variaveis);
 	}
 	
 	public void enviarEmail(String remetente, List<String> destinatarios,
