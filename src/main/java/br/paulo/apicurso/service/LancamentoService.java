@@ -54,8 +54,8 @@ public class LancamentoService {
 	private Mailer mailer;
 	
 	
-	// @Scheduled(cron = "0 30 10 * * *")
-	@Scheduled(fixedDelay = 1000 * 60 * 30)
+	@Scheduled(cron = "0 30 10 * * *")
+	// @Scheduled(fixedDelay = 1000 * 60 * 30)
 	public void avisarLancamentosVencidos() {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Preparando envio de emails com lançamentos vencidos.");

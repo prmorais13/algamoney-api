@@ -64,7 +64,6 @@ public class Contato implements Serializable {
 		this.telefone = telefone;
 	}
 
-	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "codigo_pessoa")
 	public Pessoa getPessoa() {
