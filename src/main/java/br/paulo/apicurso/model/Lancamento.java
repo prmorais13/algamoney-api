@@ -25,18 +25,45 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Table(name = "lancamento")
 public class Lancamento {
 
-	private Long codigo;
-	private String descricao;
-	private LocalDate dataVencimento;
-	private LocalDate dataPagamento;
-	private BigDecimal valor;
-	private String observacao;
-	private TipoLancamento tipo;
-	private Categoria categoria;
-	private Pessoa pessoa;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long codigo;
+	
+	@NotEmpty
+	@NotNull
+	private String descricao;
+
+	@NotNull
+	@Column(name = "data_vencimento")
+	private LocalDate dataVencimento;
+
+	@Column(name = "data_pagamento")
+	private LocalDate dataPagamento;
+
+	@NotNull
+	private BigDecimal valor;
+	private String observacao;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private TipoLancamento tipo;
+
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "codigo_categoria")
+	private Categoria categoria;
+	
+	@JsonIgnoreProperties("contatos")
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "codigo_pessoa")
+	private Pessoa pessoa;
+	
+	private String anexo;
+	
+	@Transient
+	private String urlAnexo;
+
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -45,8 +72,6 @@ public class Lancamento {
 		this.codigo = codigo;
 	}
 
-	@NotEmpty
-	@NotNull
 	public String getDescricao() {
 		return descricao;
 	}
@@ -55,8 +80,6 @@ public class Lancamento {
 		this.descricao = descricao;
 	}
 
-	@NotNull
-	@Column(name = "data_vencimento")
 	public LocalDate getDataVencimento() {
 		return dataVencimento;
 	}
@@ -65,7 +88,6 @@ public class Lancamento {
 		this.dataVencimento = dataVencimento;
 	}
 
-	@Column(name = "data_pagamento")
 	public LocalDate getDataPagamento() {
 		return dataPagamento;
 	}
@@ -74,7 +96,6 @@ public class Lancamento {
 		this.dataPagamento = dataPagamento;
 	}
 
-	@NotNull
 	public BigDecimal getValor() {
 		return valor;
 	}
@@ -91,8 +112,6 @@ public class Lancamento {
 		this.observacao = observacao;
 	}
 
-	@NotNull
-	@Enumerated(EnumType.STRING)
 	public TipoLancamento getTipo() {
 		return tipo;
 	}
@@ -101,9 +120,6 @@ public class Lancamento {
 		this.tipo = tipo;
 	}
 
-	@NotNull
-	@ManyToOne
-	@JoinColumn(name = "codigo_categoria")
 	public Categoria getCategoria() {
 		return categoria;
 	}
@@ -111,11 +127,7 @@ public class Lancamento {
 	public void setCategoria(Categoria categoria) {
 		this.categoria = categoria;
 	}
-	
-	@JsonIgnoreProperties("contatos")
-	@NotNull
-	@ManyToOne
-	@JoinColumn(name = "codigo_pessoa")
+
 	public Pessoa getPessoa() {
 		return pessoa;
 	}
@@ -124,6 +136,22 @@ public class Lancamento {
 		this.pessoa = pessoa;
 	}
 	
+	public String getAnexo() {
+		return anexo;
+	}
+
+	public void setAnexo(String anexo) {
+		this.anexo = anexo;
+	}
+
+	public String getUrlAnexo() {
+		return urlAnexo;
+	}
+
+	public void setUrlAnexo(String urlAnexo) {
+		this.urlAnexo = urlAnexo;
+	}
+
 	@JsonIgnore
 	@Transient
 	public boolean isReceita() {

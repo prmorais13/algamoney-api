@@ -1,8 +1,6 @@
 package br.paulo.apicurso.resource;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.paulo.apicurso.dto.Anexo;
 import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
 import br.paulo.apicurso.dto.LancamentoEstatisticaDia;
 import br.paulo.apicurso.event.RecursoCriadoEvent;
@@ -44,6 +43,7 @@ import br.paulo.apicurso.repository.filter.LancamentoFilter;
 import br.paulo.apicurso.repository.projection.ResumoLancamento;
 import br.paulo.apicurso.service.LancamentoService;
 import br.paulo.apicurso.service.exception.PessoaInexistenteOuInativaException;
+import br.paulo.apicurso.storage.S3;
 import net.sf.jasperreports.engine.JRException;
 
 @RestController
@@ -59,12 +59,17 @@ public class LancamentoResource {
 	@Autowired
 	private MessageSource messageSource;
 	
+	@Autowired
+	private S3 s3;
+	
 	@PostMapping("/anexo")
-	public String uploadAnexo(@RequestParam MultipartFile anexo) throws IOException {
-		OutputStream saida = new FileOutputStream("/Users/paulo/Desktop/anexo-- " + anexo.getOriginalFilename());
+	public Anexo uploadAnexo(@RequestParam MultipartFile anexo) throws IOException {
+		/*OutputStream saida = new FileOutputStream("/Users/paulo/Desktop/anexo-- " + anexo.getOriginalFilename());
 		saida.write(anexo.getBytes());
-		saida.close();
-		return "Ok";
+		saida.close();*/
+		String nome = s3.salvarTemporario(anexo);
+		
+		return new Anexo(nome, this.s3.configurarUrl(nome));
 	}
 	
 	@GetMapping("/relatorios/por-pessoa")

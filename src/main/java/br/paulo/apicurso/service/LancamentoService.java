@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import br.paulo.apicurso.dto.LancamentoEstatisticaCategoria;
 import br.paulo.apicurso.dto.LancamentoEstatisticaDia;
@@ -30,6 +31,7 @@ import br.paulo.apicurso.repository.UsuarioRepository;
 import br.paulo.apicurso.repository.filter.LancamentoFilter;
 import br.paulo.apicurso.repository.projection.ResumoLancamento;
 import br.paulo.apicurso.service.exception.PessoaInexistenteOuInativaException;
+import br.paulo.apicurso.storage.S3;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -52,6 +54,9 @@ public class LancamentoService {
 	
 	@Autowired
 	private Mailer mailer;
+	
+	@Autowired
+	private S3 s3;
 	
 	
 	@Scheduled(cron = "0 30 10 * * *")
@@ -106,6 +111,11 @@ public class LancamentoService {
 
 	public Lancamento salvar(Lancamento lancamento) {
 		this.validarPessoa(lancamento);
+		
+		if (StringUtils.hasText(lancamento.getAnexo())) {
+			this.s3.salvar(lancamento.getAnexo());
+		}
+		
 		return this.lancamentos.save(lancamento);
 	}
 	
@@ -131,6 +141,12 @@ public class LancamentoService {
 		
 		if (!lancamento.getPessoa().equals(lancamentoSalvo.getPessoa())) {
 			this.validarPessoa(lancamento);
+		}
+		
+		if (StringUtils.isEmpty(lancamento.getAnexo()) && StringUtils.hasText(lancamentoSalvo.getAnexo())) {
+			this.s3.remover(lancamentoSalvo.getAnexo());
+		} else if (StringUtils.hasText(lancamento.getAnexo()) && !lancamento.getAnexo().equals(lancamentoSalvo.getAnexo())) {
+			this.s3.substituir(lancamentoSalvo.getAnexo(), lancamento.getAnexo());
 		}
 		
 		BeanUtils.copyProperties(lancamento, lancamentoSalvo, "codigo");

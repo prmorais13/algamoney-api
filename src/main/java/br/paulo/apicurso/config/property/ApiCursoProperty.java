@@ -32,11 +32,7 @@ public class ApiCursoProperty {
 	public Mail getMail() {
 		return mail;
 	}
-	
-	/**
-	 * @author Paulo
-	 *
-	 */
+
 	public static class S3 {
 		
 		private String accessKeyId;
