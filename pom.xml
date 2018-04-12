@@ -31,6 +31,8 @@
 		<thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
 		<thymeleaf-extras-data-attribute.version>2.0.2</thymeleaf-extras-data-attribute.version>
 		<thymeleaf-extras-java8time.version>3.0.0.RELEASE</thymeleaf-extras-java8time.version>
+		
+		<aws-java-sdk.version>1.11.313</aws-java-sdk.version>
 	</properties>
 
 	<dependencies>
@@ -147,6 +149,14 @@
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-java8time</artifactId>
 		</dependency>
+		
+		<!-- aws-java-sdk-s3 -->
+		<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-java-sdk-s3</artifactId>
+		    <version>${aws-java-sdk.version}</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>

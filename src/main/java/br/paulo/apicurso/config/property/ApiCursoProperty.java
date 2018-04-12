@@ -7,24 +7,66 @@ public class ApiCursoProperty {
 
 	private String originPermitida = "http://localhost:8080";
 
+	public String getOriginPermitida() {
+		return originPermitida;
+	}
+	
+	public void setOriginPermitida(String originPermitida) {
+		this.originPermitida = originPermitida;
+	}
+	
 	private final Seguranca seguranca = new Seguranca();
 
 	public Seguranca getSeguranca() {
 		return seguranca;
 	}
-
-	public String getOriginPermitida() {
-		return originPermitida;
-	}
-
-	public void setOriginPermitida(String originPermitida) {
-		this.originPermitida = originPermitida;
+	
+	private final S3 s3 = new S3();
+	
+	public S3 getS3() {
+		return s3;
 	}
 	
 	private final Mail mail = new Mail();
 	
 	public Mail getMail() {
 		return mail;
+	}
+	
+	/**
+	 * @author Paulo
+	 *
+	 */
+	public static class S3 {
+		
+		private String accessKeyId;
+		private String secretAccessKey;
+		private String bucket = "prm-algamoney-api-arquivos";
+		
+		public String getAccessKeyId() {
+			return accessKeyId;
+		}
+		
+		public void setAccessKeyId(String accessKeyId) {
+			this.accessKeyId = accessKeyId;
+		}
+
+		public String getSecretAccessKey() {
+			return secretAccessKey;
+		}
+
+		public void setSecretAccessKey(String secretAccessKey) {
+			this.secretAccessKey = secretAccessKey;
+		}
+
+		public String getBucket() {
+			return bucket;
+		}
+
+		public void setBucket(String bucket) {
+			this.bucket = bucket;
+		}
+
 	}
 
 	public static class Seguranca {
