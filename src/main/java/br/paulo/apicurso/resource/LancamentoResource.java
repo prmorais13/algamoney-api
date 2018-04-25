@@ -63,6 +63,7 @@ public class LancamentoResource {
 	private S3 s3;
 	
 	@PostMapping("/anexo")
+	@PreAuthorize("hasAuthority('ROLE_CADASTRAR_LANCAMENTO') and #oauth2.hasScope('write')")
 	public Anexo uploadAnexo(@RequestParam MultipartFile anexo) throws IOException {
 		/*OutputStream saida = new FileOutputStream("/Users/paulo/Desktop/anexo-- " + anexo.getOriginalFilename());
 		saida.write(anexo.getBytes());
