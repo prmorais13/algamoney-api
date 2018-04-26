@@ -21,7 +21,7 @@ public class CidadeResource {
 	
 	@GetMapping
 	@PreAuthorize("isAuthenticated()")
-	public List<Cidade> pesquisar(@RequestParam Long codigo_estado) {
-		return this.cidadeService.porCodigoEstado(codigo_estado);
+	public List<Cidade> pesquisar(@RequestParam Long estado) {
+		return this.cidadeService.porCodigoEstado(estado);
 	}
 }
