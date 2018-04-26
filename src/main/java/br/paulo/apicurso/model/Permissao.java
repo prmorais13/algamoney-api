@@ -11,11 +11,13 @@ import org.hibernate.validator.constraints.NotBlank;
 @Table(name = "permissao")
 public class Permissao {
 
-	private Long codigo;
-	private String descricao;
-
 	@Id
 	@NotNull
+	private Long codigo;
+	
+	@NotBlank
+	private String descricao;
+	
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -23,8 +25,6 @@ public class Permissao {
 	public void setCodigo(Long codigo) {
 		this.codigo = codigo;
 	}
-
-	@NotBlank
 	public String getDescricao() {
 		return descricao;
 	}

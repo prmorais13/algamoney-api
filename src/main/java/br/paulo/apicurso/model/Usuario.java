@@ -17,15 +17,24 @@ import org.hibernate.validator.constraints.NotBlank;
 @Entity
 @Table(name = "usuario")
 public class Usuario {
-
-	private Long codigo;
-	private String nome;
-	private String email;
-	private String senha;
-	private List<Permissao> permissoes;
-
+	
 	@Id
 	@NotNull
+	private Long codigo;
+	private String nome;
+	
+	@Email
+	@NotBlank
+	private String email;
+	
+	@NotBlank
+	private String senha;
+	
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "usuario_permissao", joinColumns = @JoinColumn(name = "codigo_usuario"),
+	inverseJoinColumns = @JoinColumn(name = "codigo_permissao"))
+	private List<Permissao> permissoes;
+	
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -41,9 +50,6 @@ public class Usuario {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-
-	@Email
-	@NotBlank
 	public String getEmail() {
 		return email;
 	}
@@ -51,8 +57,6 @@ public class Usuario {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
-	@NotBlank
 	public String getSenha() {
 		return senha;
 	}
@@ -60,10 +64,6 @@ public class Usuario {
 	public void setSenha(String senha) {
 		this.senha = senha;
 	}
-
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "usuario_permissao", joinColumns = @JoinColumn(name = "codigo_usuario"),
-			inverseJoinColumns = @JoinColumn(name = "codigo_permissao"))
 	public List<Permissao> getPermissoes() {
 		return permissoes;
 	}

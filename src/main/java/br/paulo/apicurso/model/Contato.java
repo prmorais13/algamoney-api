@@ -20,14 +20,24 @@ public class Contato implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Long codigo;
-	private String nome;
-	private String email;
-	private String telefone;
-	private Pessoa pessoa;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long codigo;
+	
+	@NotEmpty
+	private String nome;
+	
+	@Email
+	@NotNull
+	private String email;
+	
+	@NotEmpty
+	private String telefone;
+	
+	@ManyToOne
+	@JoinColumn(name = "codigo_pessoa")
+	private Pessoa pessoa;
+
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -35,8 +45,6 @@ public class Contato implements Serializable {
 	public void setCodigo(Long codigo) {
 		this.codigo = codigo;
 	}
-
-	@NotEmpty
 	public String getNome() {
 		return nome;
 	}
@@ -44,9 +52,6 @@ public class Contato implements Serializable {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-
-	@Email
-	@NotNull
 	public String getEmail() {
 		return email;
 	}
@@ -54,8 +59,6 @@ public class Contato implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
-	@NotEmpty
 	public String getTelefone() {
 		return telefone;
 	}
@@ -63,9 +66,6 @@ public class Contato implements Serializable {
 	public void setTelefone(String telefone) {
 		this.telefone = telefone;
 	}
-
-	@ManyToOne
-	@JoinColumn(name = "codigo_pessoa")
 	public Pessoa getPessoa() {
 		return pessoa;
 	}

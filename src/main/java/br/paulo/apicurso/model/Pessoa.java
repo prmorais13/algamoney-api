@@ -24,25 +24,39 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Table(name = "pessoa")
 public class Pessoa {
 
-	private Long codigo;
-	private String nome;
-	private Boolean ativo;
-	private Endereco endereco;
-	private List<Contato> contatos;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long codigo;
+	
+	@NotNull
+	@NotEmpty
+	@Size(min = 5, max = 40)
+	private String nome;
+	
+	@NotNull
+	private Boolean ativo;
+	
+	@Embedded
+	private Endereco endereco;
+	
+	@JsonIgnoreProperties("pessoa")
+	@Valid
+	@OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Contato> contatos;
+	
 	public Long getCodigo() {
 		return codigo;
+	}
+	
+	@Transient
+	@JsonIgnore
+	public Boolean isInativo() {
+		return !ativo;
 	}
 
 	public void setCodigo(Long codigo) {
 		this.codigo = codigo;
 	}
-
-	@NotNull
-	@NotEmpty
-	@Size(min = 5, max = 40)
 	public String getNome() {
 		return nome;
 	}
@@ -50,8 +64,6 @@ public class Pessoa {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-
-	@NotNull
 	public Boolean getAtivo() {
 		return ativo;
 	}
@@ -59,8 +71,6 @@ public class Pessoa {
 	public void setAtivo(Boolean ativo) {
 		this.ativo = ativo;
 	}
-
-	@Embedded
 	public Endereco getEndereco() {
 		return endereco;
 	}
@@ -68,22 +78,12 @@ public class Pessoa {
 	public void setEndereco(Endereco endereco) {
 		this.endereco = endereco;
 	}
-	
-	@JsonIgnoreProperties("pessoa")
-	@Valid
-	@OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
 	public List<Contato> getContatos() {
 		return contatos;
 	}
 
 	public void setContatos(List<Contato> contatos) {
 		this.contatos = contatos;
-	}
-
-	@Transient
-	@JsonIgnore
-	public Boolean isInativo() {
-		return !ativo;
 	}
 
 	@Override
